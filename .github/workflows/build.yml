@@ -26,7 +26,12 @@ jobs:
 
       - name: Copy theme into SDK
         run: |
-          cp -r . openwrt-sdk/package/luci-theme-argon
+          mkdir -p openwrt-sdk/package/luci-theme-argon
+          rsync -a --delete \
+            --exclude 'openwrt-sdk/' \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            ./ openwrt-sdk/package/luci-theme-argon/
 
       - name: Build
         working-directory: openwrt-sdk
