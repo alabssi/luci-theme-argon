@@ -1,0 +1,40 @@
+name: Build luci-theme-argon
+
+on:
+  push: { branches: [ master, my-custom-argon ] }
+  pull_request: { branches: [ master ] }
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install deps
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential gawk gcc-multilib g++-multilib \
+            gettext libncurses5-dev libssl-dev python3-distutils rsync unzip zlib1g-dev file wget zstd
+
+      - name: Download ImmortalWrt SDK (ramips/mt7621)
+        run: |
+          wget https://downloads.immortalwrt.org/releases/24.10.3/targets/ramips/mt7621/immortalwrt-sdk-24.10.3-ramips-mt7621_gcc-13.3.0_musl.Linux-x86_64.tar.zst
+          tar --use-compress-program=unzstd -xvf immortalwrt-sdk-24.10.3-ramips-mt7621_gcc-13.3.0_musl.Linux-x86_64.tar.zst
+          mv immortalwrt-sdk-24.10.3-ramips-mt7621_gcc-13.3.0_musl.Linux-x86_64 openwrt-sdk
+
+      - name: Copy theme into SDK
+        run: |
+          cp -r . openwrt-sdk/package/luci-theme-argon
+
+      - name: Build
+        working-directory: openwrt-sdk
+        run: |
+          ./scripts/feeds update -a
+          ./scripts/feeds install luci
+          make package/luci-theme-argon/{clean,compile} V=s
+
+      - name: Upload IPK
+        uses: actions/upload-artifact@v4
+        with:
+          name: luci-theme-argon-ipk
+          path: openwrt-sdk/bin/packages/*/luci/luci-theme-argon_*.ipk
