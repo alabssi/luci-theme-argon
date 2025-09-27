@@ -1,8 +1,10 @@
 name: Build luci-theme-argon
 
 on:
-  push: { branches: [ master, my-custom-argon ] }
-  pull_request: { branches: [ master ] }
+  push:
+    branches: [ master, my-custom-argon ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   build:
@@ -10,12 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-- name: Install deps
-  run: |
-    sudo apt update
-    sudo apt install -y build-essential gawk gcc-multilib g++-multilib \
-      gettext libncurses5-dev libssl-dev python3-setuptools rsync unzip zlib1g-dev file wget zstd
-
+      - name: Install deps
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential gawk gcc-multilib g++-multilib \
+            gettext libncurses5-dev libssl-dev python3-setuptools rsync unzip zlib1g-dev file wget zstd
 
       - name: Download ImmortalWrt SDK (ramips/mt7621)
         run: |
