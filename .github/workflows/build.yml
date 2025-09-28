@@ -45,8 +45,18 @@ jobs:
           make defconfig
           make package/luci-theme-argon/compile V=s
 
-      - name: Upload IPK
+      - name: Collect IPK files
+        run: |
+          echo "Looking for generated ipk files..."
+          ls -lah openwrt-sdk/bin/packages || true
+          find openwrt-sdk/bin -type f -name "luci-theme-argon*.ipk" -print || true
+
+      - name: Upload IPK artifact
         uses: actions/upload-artifact@v4
         with:
           name: luci-theme-argon-ipk
-          path: openwrt-sdk/bin/packages/*/luci/luci-theme-argon_*.ipk
+          path: |
+            openwrt-sdk/bin/packages/*/luci/luci-theme-argon_*.ipk
+            openwrt-sdk/bin/packages/*/*/luci-theme-argon_*.ipk
+            openwrt-sdk/bin/packages/**/*.ipk
+
