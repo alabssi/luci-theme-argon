@@ -21,7 +21,7 @@
  *  Licensed to the public under the Apache License 2.0
  */
 :root {
-  --primary: #5e72e4;
+  --primary: linear-gradient(#024a31#024a31,);
   --dark-primary: #483d8b;
   --header-color: #fff;
   --menu-bg-color: #ffffff;
@@ -1787,9 +1787,9 @@ td > table > tbody > tr > td,
 .cbi-button-neutral[onclick="handleConfig(event)"] {
   font-weight: normal;
   color: #fff !important;
-  border: thin solid #5e72e4;
+  border: thin solid linear-gradient(#024a31,#024a31);
   border: thin solid var(--primary);
-  background-color: #5e72e4;
+  background-color: linear-gradient(#024a31,#024a31);
   background-color: var(--primary);
 }
 /* light blue */
@@ -1805,9 +1805,9 @@ td > table > tbody > tr > td,
 .cbi-button[onclick="addKey(event)"] {
   font-weight: normal;
   color: #fff !important;
-  border: thin solid #5e72e4;
+  border: thin solid linear-gradient(#024a31,#024a31);
   border: thin solid var(--primary);
-  background-color: #5e72e4;
+  background-color: linear-gradient(#024a31,#024a31);
   background-color: var(--primary);
 }
 /* red */
@@ -1892,9 +1892,9 @@ td > table > tbody > tr > td,
 .tabs li[class~="active"],
 .tabs li:hover {
   cursor: pointer;
-  border-bottom: 0.18751rem solid #5e72e4;
+  border-bottom: 0.18751rem solid linear-gradient(#024a31,#024a31);
   border-bottom: 0.18751rem solid var(--primary);
-  color: #5e72e4;
+  color: linear-gradient(#024a31,#024a31);
   color: var(--primary);
   background-color: #e4e9ee;
   margin-bottom: 0;
@@ -1902,7 +1902,7 @@ td > table > tbody > tr > td,
 }
 .tabs li[class~="active"] a,
 .tabs li:hover a {
-  color: #5e72e4;
+  color: linear-gradient(#024a31,#024a31);
   color: var(--primary);
 }
 .tabs li {
@@ -1919,7 +1919,7 @@ td > table > tbody > tr > td,
   padding: 0.5rem 0.8rem;
 }
 .tabs li:hover {
-  border-bottom: 0.18751rem solid #5e72e4;
+  border-bottom: 0.18751rem solid linear-gradient(#024a31,#024a31);
   border-bottom: 0.18751rem solid var(--primary);
 }
 .cbi-tabmenu {
@@ -1956,9 +1956,9 @@ td > table > tbody > tr > td,
 }
 .cbi-tabmenu li:hover {
   cursor: pointer;
-  border-bottom: 0.18751rem solid #5e72e4;
+  border-bottom: 0.18751rem solid linear-gradient(#024a31,#024a31);
   border-bottom: 0.18751rem solid var(--primary);
-  color: #5e72e4;
+  color: linear-gradient(#024a31,#024a31);
   color: var(--primary);
   background-color: #e4e9ee;
   margin-bottom: 0;
@@ -1967,15 +1967,15 @@ td > table > tbody > tr > td,
   color: #525f7f;
 }
 .cbi-tabmenu li[class~="cbi-tab"] {
-  border-bottom: 0.18751rem solid #5e72e4;
+  border-bottom: 0.18751rem solid linear-gradient(#024a31,#024a31);
   border-bottom: 0.18751rem solid var(--primary);
-  color: #5e72e4;
+  color: linear-gradient(#024a31,#024a31);
   color: var(--primary);
   background-color: #e4e9ee;
   margin-bottom: 0;
 }
 .cbi-tabmenu li[class~="cbi-tab"] a {
-  color: #5e72e4;
+  color: linear-gradient(#024a31,#024a31);
   color: var(--primary);
 }
 .cbi-tab-descr {
@@ -2931,7 +2931,7 @@ td > .ifacebadge,
   background: #eee;
 }
 .ifacebox-head.active {
-  background: #5e72e4;
+  background: linear-gradient(#024a31,#024a31);
   background: var(--primary);
 }
 .ifacebox-head.active * {
