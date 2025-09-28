@@ -50,8 +50,8 @@
 	}
 
 	function selectBackground(themeDir) {
-		let bgUrl = media + "/img/bg1.jpg";
-		let backgroundType = "Image";
+		let bgUrl = "";
+		let backgroundType = "none";
 		let mimeType = "";
 
 		if (fs.access("/etc/config/argon")) {
