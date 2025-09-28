@@ -33,12 +33,17 @@ jobs:
             --exclude '.github/' \
             ./ openwrt-sdk/package/luci-theme-argon/
 
-      - name: Build
+      - name: Prepare feeds
         working-directory: openwrt-sdk
         run: |
           ./scripts/feeds update -a
           ./scripts/feeds install luci
-          make package/luci-theme-argon/{clean,compile} V=s
+
+      - name: Build package (non-interactive)
+        working-directory: openwrt-sdk
+        run: |
+          make defconfig
+          make package/luci-theme-argon/compile V=s
 
       - name: Upload IPK
         uses: actions/upload-artifact@v4
