@@ -24,7 +24,7 @@ jobs:
           tar --use-compress-program=unzstd -xvf immortalwrt-sdk-24.10.3-ramips-mt7621_gcc-13.3.0_musl.Linux-x86_64.tar.zst
           mv immortalwrt-sdk-24.10.3-ramips-mt7621_gcc-13.3.0_musl.Linux-x86_64 openwrt-sdk
 
-      - name: Copy theme into SDK
+      - name: Copy theme into SDK (and remove bg1.jpg)
         run: |
           mkdir -p openwrt-sdk/package/luci-theme-argon
           rsync -a --delete \
@@ -32,6 +32,9 @@ jobs:
             --exclude '.git/' \
             --exclude '.github/' \
             ./ openwrt-sdk/package/luci-theme-argon/
+          # احذف الخلفية الافتراضية من الشجرة قبل البناء
+          rm -f openwrt-sdk/package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
+          test ! -f openwrt-sdk/package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
 
       - name: Prepare feeds
         working-directory: openwrt-sdk
@@ -45,11 +48,21 @@ jobs:
           make defconfig
           make package/luci-theme-argon/compile V=s
 
+      - name: Assert bg1.jpg not inside IPK
+        run: |
+          set -e
+          ipk=$(find openwrt-sdk/bin -type f -name 'luci-theme-argon_*.ipk' | head -n1)
+          echo "Checking $ipk"
+          ar x "$ipk"
+          if tar -tf data.tar.gz | grep -q 'argon/img/bg1.jpg'; then
+            echo "ERROR: bg1.jpg found inside IPK"; exit 1
+          fi
+          rm -f control.tar.* data.tar.* debian-binary
+
       - name: Collect IPK files
         run: |
-          echo "Looking for generated ipk files..."
-          ls -lah openwrt-sdk/bin/packages || true
-          find openwrt-sdk/bin -type f -name "luci-theme-argon*.ipk" -print || true
+          echo "Generated IPKs:"
+          find openwrt-sdk/bin -type f -name "luci-theme-argon*.ipk" -print
 
       - name: Upload IPK artifact
         uses: actions/upload-artifact@v4
@@ -59,4 +72,3 @@ jobs:
             openwrt-sdk/bin/packages/*/luci/luci-theme-argon_*.ipk
             openwrt-sdk/bin/packages/*/*/luci-theme-argon_*.ipk
             openwrt-sdk/bin/packages/**/*.ipk
-
