@@ -24,34 +24,28 @@ jobs:
           tar --use-compress-program=unzstd -xvf immortalwrt-sdk-24.10.3-ramips-mt7621_gcc-13.3.0_musl.Linux-x86_64.tar.zst
           mv immortalwrt-sdk-24.10.3-ramips-mt7621_gcc-13.3.0_musl.Linux-x86_64 openwrt-sdk
 
+      - name: Copy theme into SDK (remove bg1.jpg)
+        run: |
+          mkdir -p openwrt-sdk/package/luci-theme-argon
+          rsync -a --delete \
+            --exclude 'openwrt-sdk/' \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            ./ openwrt-sdk/package/luci-theme-argon/
+          # احذف صورة الخلفية قبل البناء
+          rm -f openwrt-sdk/package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
+
       - name: Prepare feeds
         working-directory: openwrt-sdk
         run: |
           ./scripts/feeds update -a
-          ./scripts/feeds install luci
+          ./scripts/feeds install -a
 
-      - name: Replace theme inside luci feed (and remove bg1.jpg)
-        run: |
-          # مسار نسخة الثيم داخل الفيد
-          THEME_DIR="openwrt-sdk/feeds/luci/themes/luci-theme-argon"
-          rm -rf "$THEME_DIR"
-          mkdir -p "$THEME_DIR"
-          # انسخ مشروعك إلى مسار الفيد
-          rsync -a --delete \
-            --exclude '.git/' \
-            --exclude '.github/' \
-            ./ "$THEME_DIR"/
-          # احذف الخلفية الافتراضية
-          rm -f "$THEME_DIR/htdocs/luci-static/argon/img/bg1.jpg"
-          test ! -f "$THEME_DIR/htdocs/luci-static/argon/img/bg1.jpg"
-
-      - name: Build package (use feed path)
+      - name: Build package (non-interactive)
         working-directory: openwrt-sdk
         run: |
           make defconfig
-          # ابنِ من هدف الفيد لضمان تعرف make على المسار
-          make -j$(nproc) V=s package/feeds/luci/luci-theme-argon/clean
-          make -j1 V=s package/feeds/luci/luci-theme-argon/compile
+          make package/luci-theme-argon/compile V=s
 
       - name: Assert bg1.jpg not inside IPK
         run: |
