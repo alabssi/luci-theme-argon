@@ -10,21 +10,26 @@ PKG_RELEASE:=20250722
 CONFIG_LUCI_CSSTIDY:=
 
 define Package/$(PKG_NAME)/install
+	# static assets
 	$(INSTALL_DIR) $(1)/www/luci-static/argon
+	# انسخ كل شيء ثم احذف bg1.jpg قبل إغلاق مرحلة install
 	$(CP) ./htdocs/luci-static/argon/* $(1)/www/luci-static/argon/ 2>/dev/null || true
+	$(RM) -f $(1)/www/luci-static/argon/img/bg1.jpg
 
+	# ucode views
 	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/themes/argon
 	$(CP) ./ucode/template/themes/argon/* $(1)/www/luci-static/resources/view/themes/argon/ 2>/dev/null || true
 
+	# lua views
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/themes/argon
 	$(CP) ./luasrc/view/themes/argon/* $(1)/usr/lib/lua/luci/view/themes/argon/ 2>/dev/null || true
 
+	# uci defaults
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) ./root/etc/uci-defaults/* $(1)/etc/uci-defaults/ 2>/dev/null || true
-
-	rm -f $(1)/www/luci-static/argon/img/bg1.jpg || true
 endef
 
+# إزالة bg1.jpg على الجهاز الهدف فقط كاحتياط إذا كانت موجودة من تثبيت سابق
 define Package/$(PKG_NAME)/postinst
 #!/bin/sh
 [ -n "$$IPKG_INSTROOT" ] || rm -f /www/luci-static/argon/img/bg1.jpg
