@@ -32,21 +32,23 @@ jobs:
             --exclude '.git/' \
             --exclude '.github/' \
             ./ openwrt-sdk/package/luci-theme-argon/
-          # احذف الخلفية الافتراضية من الشجرة قبل البناء
           rm -f openwrt-sdk/package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
           test ! -f openwrt-sdk/package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
 
-      - name: Prepare feeds
+      - name: Prepare feeds (remove feed's theme copy)
         working-directory: openwrt-sdk
         run: |
           ./scripts/feeds update -a
           ./scripts/feeds install luci
+          rm -rf feeds/luci/themes/luci-theme-argon || true
+          test -f package/luci-theme-argon/Makefile
 
       - name: Build package (non-interactive)
         working-directory: openwrt-sdk
         run: |
           make defconfig
-          make package/luci-theme-argon/compile V=s
+          make package/index
+          make package/luci-theme-argon/{clean,compile} V=s
 
       - name: Assert bg1.jpg not inside IPK
         run: |
