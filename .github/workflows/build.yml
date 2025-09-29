@@ -43,12 +43,13 @@ jobs:
           rm -rf feeds/luci/themes/luci-theme-argon || true
           test -f package/luci-theme-argon/Makefile
 
-      - name: Build package (non-interactive)
+      - name: Build package (non-interactive, no package/index)
         working-directory: openwrt-sdk
         run: |
           make defconfig
-          make package/index
-          make package/luci-theme-argon/{clean,compile} V=s
+          grep -n "BuildPackage" package/luci-theme-argon/Makefile || true
+          make -j$(nproc) V=s package/luci-theme-argon/clean
+          make -j1 V=s package/luci-theme-argon/compile
 
       - name: Assert bg1.jpg not inside IPK
         run: |
