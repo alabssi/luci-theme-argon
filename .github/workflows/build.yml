@@ -28,19 +28,22 @@ jobs:
         run: |
           mkdir -p openwrt-sdk/package/luci-theme-argon
           rsync -a --delete \
-            --exclude '.git*' \
+            --exclude 'openwrt-sdk/**' \
+            --exclude '.git*/' \
             --exclude '.github/' \
             --exclude 'Screenshots/' \
             --exclude 'LICENSE' \
             --exclude 'README*' \
             ./ openwrt-sdk/package/luci-theme-argon/
-          rm -f openwrt-sdk/package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
+          rm -f openwrt-sdk/package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg || true
 
       - name: Prepare feeds
         working-directory: openwrt-sdk
         run: |
           ./scripts/feeds update -a
-          ./scripts/feeds install -a
+          ./scripts/feeds install luci
+          # تأكد عدم وجود نسخة الثيم من الـfeeds لتفادي التعارض
+          rm -rf feeds/luci/themes/luci-theme-argon || true
 
       - name: Build package (non-interactive)
         working-directory: openwrt-sdk
@@ -51,14 +54,21 @@ jobs:
       - name: Assert bg1.jpg not inside IPK
         run: |
           set -e
-          ipk=$(find openwrt-sdk/bin -type f -name 'luci-theme-argon_*.ipk' | head -n1)
-          echo "Checking $ipk"
-          tar -Oxf "$ipk" ./data.tar.gz | tar -tzf - | grep 'argon/img/bg1.jpg' && { echo "ERROR: bg1.jpg found inside IPK"; exit 1; } || true
+          ipk="$(find openwrt-sdk/bin -type f -name 'luci-theme-argon_*.ipk' | head -n1 || true)"
+          echo "IPK => ${ipk}"
+          if [ -z "$ipk" ]; then
+            echo "ERROR: IPK not found"; exit 1
+          fi
+          ar t "$ipk" >/dev/null 2>&1 || { echo "ERROR: Not a valid IPK"; exit 1; }
+          ar x "$ipk"
+          if tar -tf data.tar.gz | grep -q 'argon/img/bg1.jpg'; then
+            echo "ERROR: bg1.jpg found inside IPK"; exit 1
+          fi
+          rm -f control.tar.* data.tar.* debian-binary
 
       - name: Collect IPK files
         run: |
-          echo "Generated IPKs:"
-          find openwrt-sdk/bin -type f -name "luci-theme-argon*.ipk" -print
+          find openwrt-sdk/bin -type f -name "luci-theme-argon_*.ipk" -print
 
       - name: Upload IPK artifact
         uses: actions/upload-artifact@v4
@@ -67,4 +77,3 @@ jobs:
           path: |
             openwrt-sdk/bin/packages/*/luci/luci-theme-argon_*.ipk
             openwrt-sdk/bin/packages/*/*/luci-theme-argon_*.ipk
-            openwrt-sdk/bin/packages/**/*.ipk
