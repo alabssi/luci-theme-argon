@@ -45,7 +45,10 @@ jobs:
       - name: Build package (non-interactive)
         working-directory: openwrt-sdk
         run: |
+          set -eux
           make defconfig
+          make package/index V=s
+          test -f package/luci-theme-argon/Makefile
           make package/luci-theme-argon/compile V=s
 
       - name: Assert bg1.jpg not inside IPK
@@ -55,7 +58,6 @@ jobs:
           echo "Checking: $ipk"
           work="/tmp/ipk_check"
           rm -rf "$work" && mkdir -p "$work"
-          # bsdtar يفك ipk (ar) ثم نحدد data.tar.*
           bsdtar -xf "$ipk" -C "$work"
           data_tar="$(ls "$work"/data.tar.* | head -n1)"
           if [ -z "$data_tar" ]; then
