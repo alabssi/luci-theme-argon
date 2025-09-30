@@ -1,39 +1,33 @@
-# Makefile for luci-theme-argon (custom)
+# Copyright (C) 2008-2019 Jerrykuku
+# Apache-2.0
 
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=luci-theme-argon
 LUCI_TITLE:=Argon Theme
+LUCI_PKGARCH:=all
 LUCI_DEPENDS:=+wget +jsonfilter
 PKG_VERSION:=2.4.3
 PKG_RELEASE:=20250722
+
+# اتركها فارغة لإطفاء تصغير CSS داخل بيئة البناء إن لزم
 CONFIG_LUCI_CSSTIDY:=
 
-define Package/$(PKG_NAME)/install
-	# static assets
+# مهم: اجعل مرحلة التثبيت قبل تضمين luci.mk
+define Package/luci-theme-argon/install
+	# ملفات statics
 	$(INSTALL_DIR) $(1)/www/luci-static/argon
-	# انسخ كل شيء ثم احذف bg1.jpg قبل إغلاق مرحلة install
-	$(CP) ./htdocs/luci-static/argon/* $(1)/www/luci-static/argon/ 2>/dev/null || true
-	$(RM) -f $(1)/www/luci-static/argon/img/bg1.jpg
+	$(CP) -r ./htdocs/luci-static/argon/* $(1)/www/luci-static/argon/
+	# احذف الخلفية الافتراضية
+	rm -f $(1)/www/luci-static/argon/img/bg1.jpg
 
-	# ucode views
-	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/themes/argon
-	$(CP) ./ucode/template/themes/argon/* $(1)/www/luci-static/resources/view/themes/argon/ 2>/dev/null || true
+	# قوالب ucode / الثيم
+	$(INSTALL_DIR) $(1)/usr/share/luci/themes
+	$(CP) -r ./ucode/template/themes/argon/* $(1)/usr/share/luci/themes/ 2>/dev/null || true
 
-	# lua views
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/themes/argon
-	$(CP) ./luasrc/view/themes/argon/* $(1)/usr/lib/lua/luci/view/themes/argon/ 2>/dev/null || true
-
-	# uci defaults
+	# سكربتات الإعدادات الافتراضية (إن وجدت)
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
-	$(INSTALL_BIN) ./root/etc/uci-defaults/* $(1)/etc/uci-defaults/ 2>/dev/null || true
-endef
-
-# إزالة bg1.jpg على الجهاز الهدف فقط كاحتياط إذا كانت موجودة من تثبيت سابق
-define Package/$(PKG_NAME)/postinst
-#!/bin/sh
-[ -n "$$IPKG_INSTROOT" ] || rm -f /www/luci-static/argon/img/bg1.jpg
-exit 0
+	$(CP) -r ./root/etc/uci-defaults/* $(1)/etc/uci-defaults/ 2>/dev/null || true
 endef
 
 include $(TOPDIR)/feeds/luci/luci.mk
+# call BuildPackage - OpenWrt buildroot signature
