@@ -32,28 +32,25 @@ jobs:
             --exclude 'openwrt-sdk/' \
             --exclude '.git/' \
             --exclude '.github/' \
-            --exclude '.github/workflows/' \
-            --exclude '.gitignore' \
+            --exclude 'Screenshots/' \
             ./ openwrt-sdk/package/luci-theme-argon/
-          # شيل الخلفية الافتراضية
           rm -f openwrt-sdk/package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg || true
 
-      - name: Prepare feeds (just luci)
+      - name: Prepare feeds
         working-directory: openwrt-sdk
         run: |
-          ./scripts/feeds update luci
+          ./scripts/feeds update -a
           ./scripts/feeds install luci
+          rm -rf feeds/luci/themes/luci-theme-argon || true
+          test -f package/luci-theme-argon/Makefile
 
-      - name: Build package (non-interactive)
+      - name: Build package
         working-directory: openwrt-sdk
+        env:
+          MAKEFLAGS: "-j$(nproc)"
         run: |
           make defconfig
           make package/luci-theme-argon/compile V=s
-
-      - name: Collect IPK files
-        run: |
-          echo "Generated IPKs:"
-          find openwrt-sdk/bin -type f -name "luci-theme-argon_*.ipk" -print
 
       - name: Upload IPK artifact
         uses: actions/upload-artifact@v4
