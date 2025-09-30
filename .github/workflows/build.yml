@@ -24,13 +24,15 @@ jobs:
           tar --use-compress-program=unzstd -xvf immortalwrt-sdk-24.10.3-ramips-mt7621_gcc-13.3.0_musl.Linux-x86_64.tar.zst
           mv immortalwrt-sdk-24.10.3-ramips-mt7621_gcc-13.3.0_musl.Linux-x86_64 openwrt-sdk
 
-      - name: Copy theme into SDK (remove bg1.jpg)
+      - name: Copy theme into SDK (pruned, remove bg1.jpg)
         run: |
           mkdir -p openwrt-sdk/package/luci-theme-argon
           rsync -a --delete \
-            --exclude 'openwrt-sdk/' \
-            --exclude '.git/' \
+            --exclude '.git*' \
             --exclude '.github/' \
+            --exclude 'Screenshots/' \
+            --exclude 'LICENSE' \
+            --exclude 'README*' \
             ./ openwrt-sdk/package/luci-theme-argon/
           rm -f openwrt-sdk/package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
 
@@ -40,7 +42,7 @@ jobs:
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
-      - name: Build luci-theme-argon only
+      - name: Build package (non-interactive)
         working-directory: openwrt-sdk
         run: |
           make defconfig
@@ -49,21 +51,9 @@ jobs:
       - name: Assert bg1.jpg not inside IPK
         run: |
           set -e
-          ipk=$(find openwrt-sdk/bin -type f -name 'luci-theme-argon_*.ipk' | head -n1 || true)
+          ipk=$(find openwrt-sdk/bin -type f -name 'luci-theme-argon_*.ipk' | head -n1)
           echo "Checking $ipk"
-          if [ -z "$ipk" ]; then
-            echo "ERROR: No IPK file found"
-            exit 1
-          fi
-          if ar t "$ipk" >/dev/null 2>&1; then
-            ar x "$ipk"
-            if tar -tf data.tar.* | grep -q 'argon/img/bg1.jpg'; then
-              echo "ERROR: bg1.jpg found inside IPK"; exit 1
-            fi
-            rm -f control.tar.* data.tar.* debian-binary
-          else
-            echo "WARNING: $ipk not a standard ar archive (skipping strict check)"
-          fi
+          tar -Oxf "$ipk" ./data.tar.gz | tar -tzf - | grep 'argon/img/bg1.jpg' && { echo "ERROR: bg1.jpg found inside IPK"; exit 1; } || true
 
       - name: Collect IPK files
         run: |
