@@ -24,7 +24,7 @@
   --primary: linear-gradient(#024a31,#024a31);
   --dark-primary: #483d8b;
   --header-color: #fff;
-  --menu-bg-color: #f0efef;
+  --menu-bg-color: #ffffff;
   --menu-color: #5f6368;
   --main-menu-color: #202124;
   --red: #f5365c;
@@ -46,7 +46,7 @@
   --default: #172b4d;
   --white: #fff;
   --darker: black;
-  --background-color: #f0efef;
+  --background-color: #f4f5f7;
   --login-form-bg-color: rgba(244, 245, 247, 0.8);
   --blur-radius: 10px;
   --blur-opacity: 0.5;
@@ -288,46 +288,31 @@ button:-moz-focusring {
   appearance: button;
   font: inherit;
 }
-/* استهداف صناديق لوچي (OpenWrt LuCI). زد !important لفرض النمط */
-.cbi-widget input[type="checkbox"],
 input[type="checkbox"] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border: 2px solid rgba(0,0,0,.45) !important;  /* أسود خفيف */
-  border-radius: 50% !important;                  /* دائري */
-  background: #fff !important;
-  display: inline-grid;
-  place-content: center;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  border: 1px solid var(--primary);
+  width: 1rem !important;
+  height: 1rem !important;
+  padding: 0;
   cursor: pointer;
-  outline: none;
+  transition: all 0.2s;
 }
-
-/* رسم علامة الصح السوداء */
-.cbi-widget input[type="checkbox"]::before,
-input[type="checkbox"]::before {
-  content: "";
-  width: 10px;
-  height: 10px;
-  box-shadow: inset 1em 1em #000;                 /* لون الصح أسود */
-  transform: scale(0);
-  transition: 120ms transform ease-in-out;
-  clip-path: polygon(14% 44%, 0 62%, 46% 100%, 100% 18%, 82% 0, 44% 62%);
+input[type="checkbox"]:checked {
+  border: 1px solid var(--primary);
+  background-image: url('data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 8 8\'%3e%3cpath fill=\'%23fff\' d=\'M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z\'/%3e%3c/svg%3e') !important;
+  background-color: var(--primary);
+  background-size: 70%;
+  background-repeat: no-repeat;
+  background-position: center;
 }
-
-/* تفعيل وإظهار الصح */
-.cbi-widget input[type="checkbox"]:checked::before,
-input[type="checkbox"]:checked::before {
-  transform: scale(1);
+select {
+  padding: 0.36rem 0.8rem;
+  color: var(--gray-dark);
+  border: thin solid var(--lighter);
+  background-color: var(--white);
+  background-image: none;
 }
-
-/* حالة التركيز اختياري */
-.cbi-widget input[type="checkbox"]:focus,
-input[type="checkbox"]:hover {
-  box-shadow: 0 0 0 2px rgba(0,0,0,.08);
-}
-
 textarea {
   padding: 0.25rem;
   overflow: auto;
@@ -824,7 +809,7 @@ select[multiple="multiple"] {
   font-size: 1rem;
   line-height: 1.5em;
   color: var(--default);
-  background-color: #ffffff;
+  background-color: transparent;
   background-clip: padding-box;
   border: 0;
   border-bottom: 1px solid var(--white);
@@ -857,7 +842,7 @@ select[multiple="multiple"] {
   color: var(--white);
   text-align: center;
   letter-spacing: 0.8rem;
-  background-color: #23543;
+  background-color: var(--primary) !important;
   border: none;
   border-radius: 6px;
   outline: none;
@@ -1314,7 +1299,7 @@ header .fill .status span[data-indicator="poll-status"] {
   color: #fff;
 }
 header .fill .status span[data-style="active"] {
-  background-color: #024a31;
+  background-color: var(--green);
 }
 header .fill .status span[data-style="inactive"] {
   color: #ffffff !important;
@@ -1374,7 +1359,7 @@ footer > a {
   color: #fff;
 }
 .error {
-  color: #000000;
+  color: var(--danger);
 }
 .alert,
 .alert-message {
@@ -1404,7 +1389,7 @@ footer > a {
 }
 .alert.error,
 .alert-message.error {
-  background-color: #d7330e;
+  background-color: var(--warning);
 }
 .alert h4,
 .alert-message h4 {
@@ -1785,8 +1770,8 @@ td > table > tbody > tr > td,
 .cbi-button[name="restart"],
 .cbi-button[onclick="hide_empty(this)"] {
   color: #fff;
-  border: thin solid #086508cc;
-  background-color: #086508cc;
+  border: thin solid #8898aa;
+  background-color: #8898aa;
 }
 /* dark blue */
 .btn.primary,
@@ -1801,11 +1786,11 @@ td > table > tbody > tr > td,
 .cbi-button[value^="Back"],
 .cbi-button-neutral[onclick="handleConfig(event)"] {
   font-weight: normal;
-  color: #fff;
+  color: #fff !important;
   border: thin solid linear-gradient(#024a31,#024a31);
   border: thin solid var(--primary);
-  background-color: #086508cc;
-  background-color: #086508cc;
+  background-color: linear-gradient(#024a31,#024a31);
+  background-color: var(--primary);
 }
 /* light blue */
 .cbi-page-actions .cbi-button-apply,
@@ -1819,11 +1804,11 @@ td > table > tbody > tr > td,
 .cbi-button[value$="Apply"],
 .cbi-button[onclick="addKey(event)"] {
   font-weight: normal;
-  color: #fff;
+  color: #fff !important;
   border: thin solid linear-gradient(#024a31,#024a31);
   border: thin solid var(--primary);
-  background-color: #086508cc;
-  background-color: #086508cc;
+  background-color: linear-gradient(#024a31,#024a31);
+  background-color: var(--primary);
 }
 /* red */
 .btn.danger,
@@ -1954,7 +1939,7 @@ td > table > tbody > tr > td,
   background-color: #fff;
 }
 .cbi-tabmenu li {
-  background: #7be159cc;
+  background: #dce3e9;
   display: inline-block;
   font-size: 0.875rem;
   border-top-left-radius: 0.25rem;
@@ -1991,7 +1976,7 @@ td > table > tbody > tr > td,
 }
 .cbi-tabmenu li[class~="cbi-tab"] a {
   color: linear-gradient(#024a31,#024a31);
-  color: #292c32;
+  color: var(--primary);
 }
 .cbi-tab-descr {
   padding: 0 1.25rem;
@@ -4293,33 +4278,3 @@ div[style*="display:grid;grid-template-columns:repeat"] .ifacebox .ifacebox-body
     background: var(--primary);
   }
 }
-/* ===== Custom footer & login tweaks ===== */
-
-/* اخفِ روابط الفوتر الافتراضية وأضِف نصك */
-.login-page .login-container footer .luci-link,
-footer .luci-link { display: none !important; }
-
-.login-page .login-container footer::after,
-footer::after {
-  content: "أفق التقنية ALI ALABSI :774940122";
-  display: block;
-  text-align: center;
-  font-weight: 600;
-  opacity: .95;
-  color: #086508cc;       /* غيّر اللون إن أردت */
-  width: 100% !important;
-  min-height: 50px;
-  text-align: center;
-  background-color: #23543;
-  border: none;
-  border-radius: 6px;
-  outline: none;
-  cursor: pointer;
-  box-shadow: rgba(0, 0, 0, 0.1) 0 0 50px 0;
-}
-
-/* اخفاء رابط اسم الثيم بكل الصفحات */
-footer .luci-link,
-footer a[href*="luci-theme-argon"]{
-  display:none !important;
-  
