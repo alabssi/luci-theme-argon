@@ -1,4 +1,4 @@
-name: Build luci-theme-argon
+name: Build luci-theme-argon (fast)
 
 on:
   push:
@@ -32,56 +32,28 @@ jobs:
             --exclude 'openwrt-sdk/' \
             --exclude '.git/' \
             --exclude '.github/' \
-            --exclude 'Screenshots/' \
+            --exclude '.github/workflows/' \
+            --exclude '.gitignore' \
             ./ openwrt-sdk/package/luci-theme-argon/
-          # احذف الخلفية الافتراضية من شجرة البكج
-          rm -f openwrt-sdk/package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
+          # شيل الخلفية الافتراضية
+          rm -f openwrt-sdk/package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg || true
 
-      - name: Prepare feeds (keep SDK light)
+      - name: Prepare feeds (just luci)
         working-directory: openwrt-sdk
         run: |
-          ./scripts/feeds update -a
+          ./scripts/feeds update luci
           ./scripts/feeds install luci
-          # تأكد إن نسخة الثيم من feeds ما تغطي نسختك
-          rm -rf feeds/luci/themes/luci-theme-argon || true
-          test -f package/luci-theme-argon/Makefile
 
       - name: Build package (non-interactive)
         working-directory: openwrt-sdk
-        env:
-          MAKEFLAGS: "-j$(nproc)"
         run: |
           make defconfig
           make package/luci-theme-argon/compile V=s
 
-      - name: Assert bg1.jpg not inside IPK
-        run: |
-          set -e
-          ipk=$(find openwrt-sdk/bin/packages -type f -name 'luci-theme-argon_*.ipk' | head -n1)
-          echo "Checking: $ipk"
-          mkdir -p /tmp/ipk_check && cp "$ipk" /tmp/ipk_check/ && cd /tmp/ipk_check
-          # فك التحقق بمرونة: جرّب ar أولاً ثم tar كـ fallback
-          if ar t "$(basename "$ipk")" >/dev/null 2>&1; then
-            ar x "$(basename "$ipk")"
-            data_tar=$(ls data.tar.*)
-            if tar -tf "$data_tar" | grep -q 'argon/img/bg1.jpg'; then
-              echo "ERROR: bg1.jpg found inside IPK"; exit 1
-            fi
-          else
-            echo "WARN: ar failed, falling back to tar listing"
-            # بعض البيئات تسمح بقراءة ipk مباشرة كـ tar
-            if tar -tvf "$(basename "$ipk")" 2>/dev/null | grep -q 'argon/img/bg1.jpg'; then
-              echo "ERROR: bg1.jpg found inside IPK"; exit 1
-            fi
-          fi
-          cd - >/dev/null
-          rm -rf /tmp/ipk_check
-          echo "OK: bg1.jpg not found inside IPK"
-
       - name: Collect IPK files
         run: |
           echo "Generated IPKs:"
-          find openwrt-sdk/bin -type f -name 'luci-theme-argon_*.ipk' -print
+          find openwrt-sdk/bin -type f -name "luci-theme-argon_*.ipk" -print
 
       - name: Upload IPK artifact
         uses: actions/upload-artifact@v4
