@@ -288,31 +288,46 @@ button:-moz-focusring {
   appearance: button;
   font: inherit;
 }
+/* استهداف صناديق لوچي (OpenWrt LuCI). زد !important لفرض النمط */
+.cbi-widget input[type="checkbox"],
 input[type="checkbox"] {
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  border: 1px solid var(--primary);
-  width: 1rem !important;
-  height: 1rem !important;
-  padding: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(0,0,0,.45) !important;  /* أسود خفيف */
+  border-radius: 50% !important;                  /* دائري */
+  background: #fff !important;
+  display: inline-grid;
+  place-content: center;
   cursor: pointer;
-  transition: all 0.2s;
+  outline: none;
 }
-input[type="checkbox"]:checked {
-  border: 1px solid var(--primary);
-  background-image: url('data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 8 8\'%3e%3cpath fill=\'%23fff\' d=\'M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z\'/%3e%3c/svg%3e') !important;
-  background-color: var(--primary);
-  background-size: 70%;
-  background-repeat: no-repeat;
-  background-position: center;
+
+/* رسم علامة الصح السوداء */
+.cbi-widget input[type="checkbox"]::before,
+input[type="checkbox"]::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  box-shadow: inset 1em 1em #000;                 /* لون الصح أسود */
+  transform: scale(0);
+  transition: 120ms transform ease-in-out;
+  clip-path: polygon(14% 44%, 0 62%, 46% 100%, 100% 18%, 82% 0, 44% 62%);
 }
-select {
-  padding: 0.36rem 0.8rem;
-  color: var(--gray-dark);
-  border: thin solid var(--lighter);
-  background-color: var(--white);
-  background-image: none;
+
+/* تفعيل وإظهار الصح */
+.cbi-widget input[type="checkbox"]:checked::before,
+input[type="checkbox"]:checked::before {
+  transform: scale(1);
 }
+
+/* حالة التركيز اختياري */
+.cbi-widget input[type="checkbox"]:focus,
+input[type="checkbox"]:hover {
+  box-shadow: 0 0 0 2px rgba(0,0,0,.08);
+}
+
 textarea {
   padding: 0.25rem;
   overflow: auto;
