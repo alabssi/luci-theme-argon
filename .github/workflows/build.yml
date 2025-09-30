@@ -16,8 +16,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y build-essential gawk gcc-multilib g++-multilib \
-            gettext libncurses5-dev libssl-dev python3-setuptools rsync unzip zlib1g-dev file wget zstd \
-            libarchive-tools
+            gettext libncurses5-dev libssl-dev python3-setuptools rsync unzip zlib1g-dev file wget zstd
 
       - name: Download ImmortalWrt SDK (ramips/mt7621)
         run: |
@@ -51,20 +50,17 @@ jobs:
       - name: Assert bg1.jpg not inside IPK
         run: |
           set -e
-          ipk="$(find openwrt-sdk/bin -type f -name 'luci-theme-argon_*.ipk' | head -n1)"
-          echo "Checking: $ipk"
-          # فك محتويات ipk باستخدام bsdtar (يتعامل مع ar تلقائياً)
-          work=/tmp/ipk_check
-          rm -rf "$work"
-          mkdir -p "$work"
-          bsdtar -xf "$ipk" -C "$work"
-          data_tar="$(ls "$work"/data.tar.*)"
-          echo "Found payload: $data_tar"
-          if bsdtar -tf "$data_tar" | grep -q 'argon/img/bg1.jpg'; then
-            echo "ERROR: bg1.jpg found inside IPK"
-            exit 1
+          # نبحث فقط عن IPK الحقيقي داخل مجلد packages
+          ipk=$(find openwrt-sdk/bin/packages -type f -name 'luci-theme-argon_*.ipk' | head -n1)
+          echo "Checking $ipk"
+          ar x "$ipk" || { echo "ar failed, not a valid IPK"; exit 1; }
+          if [ ! -f data.tar.gz ]; then
+            echo "No data.tar.gz found inside $ipk"; exit 1
           fi
-          echo "OK: bg1.jpg not present in IPK"
+          if tar -tf data.tar.gz | grep -q 'argon/img/bg1.jpg'; then
+            echo "ERROR: bg1.jpg found inside IPK"; exit 1
+          fi
+          rm -f control.tar.* data.tar.* debian-binary
 
       - name: Collect IPK files
         run: |
