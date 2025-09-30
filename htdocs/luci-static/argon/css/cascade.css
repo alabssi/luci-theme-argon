@@ -4278,3 +4278,33 @@ div[style*="display:grid;grid-template-columns:repeat"] .ifacebox .ifacebox-body
     background: var(--primary);
   }
 }
+
+/* ===== Custom footer & login tweaks ===== */
+
+/* اخفِ روابط الفوتر الافتراضية وأضِف نصك */
+.login-page .login-container footer .luci-link,
+footer .luci-link { display: none !important; }
+
+.login-page .login-container footer::after,
+footer::after {
+  content: "أفق التقنية ALI ALABSI :774940122";
+  display: block;
+  text-align: center;
+  font-weight: 600;
+  opacity: .95;
+  color: #086508cc;       /* غيّر اللون إن أردت */
+  width: 100% !important;
+  min-height: 50px;
+  text-align: center;
+  background-color: #23543;
+  border: none;
+  border-radius: 6px;
+  outline: none;
+  cursor: pointer;
+  box-shadow: rgba(0, 0, 0, 0.1) 0 0 50px 0;
+}
+
+/* اخفاء رابط اسم الثيم بكل الصفحات */
+footer .luci-link,
+footer a[href*="luci-theme-argon"]{
+  display:none !important;
